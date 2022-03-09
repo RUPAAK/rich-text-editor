@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import ReactQuill from "react-quill"; // Typescript
 import EditorToolbar, { modules, formats } from "./EditorToolbar";
 import "react-quill/dist/quill.snow.css"; // ES6
 import "../styles.css";
+import toast, { Toaster } from "react-hot-toast";
+
+var quillObj: any;
+
+const titleHeight = 12;
+const notify = (noti: any) => toast(noti);
 
 const Editor = () => {
+  const [title, settitle] = useState<string>("");
+  const [desc, setdesc] = useState<string>("");
+
   //   const [state, setState] = React.useState({ value: null });
-  var quillObj: any;
 
   const consoleText = () => {
     const range = quillObj.getEditorSelection();
@@ -33,34 +41,74 @@ const Editor = () => {
         );
     };
   };
+  const modules = useMemo(
+    () => ({
+      toolbar: {
+        container: "#toolbar", // Selector for toolbar container
+        handlers: {
+          image: () => consoleText(),
+        },
+      },
+    }),
+    []
+  );
 
-  const handleChange = (value: any) => {
-    // setState({ value });
-    console.log(value);
+  const submitBlog = async () => {
+    if (title.length === 0) return notify("Please Give Valid Title");
+    if (desc.length === 0) return notify("Please Give Description");
+    console.log(title, desc);
+  };
+  const handleChange = (value: string) => {
+    setdesc(value);
+  };
+  const titleChange = (title: string) => {
+    settitle(title);
   };
   return (
     <>
+      <div
+        style={{
+          maxWidth: "100%",
+          padding: "0 2rem 0 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <p>Draft</p>
+        <button onClick={submitBlog}>Publish</button>
+        <Toaster />
+      </div>
       <EditorToolbar />
-      <ReactQuill
-        ref={(el) => {
-          quillObj = el;
-        }}
-        theme="snow"
-        // value={state.value}
-        onChange={handleChange}
-        placeholder={"Write something awesome..."}
-        modules={{
-          toolbar: {
-            container: "#toolbar", // Selector for toolbar container
-            handlers: {
-              //   bold: customBoldHandler,
-              image: consoleText,
-            },
-          },
-        }}
-        // modules={modules}
-        formats={formats}
-      />{" "}
+      <div>
+        <input
+          value={title}
+          onChange={(e) => titleChange(e.target.value)}
+          placeholder="Title of you blog..."
+          style={{ padding: `${titleHeight}px`, width: "100%", border: "none" }}
+        />
+        <ReactQuill
+          value={desc}
+          ref={(el) => {
+            quillObj = el;
+          }}
+          // style={{ padding: "2rem 0", }}
+          theme="snow"
+          // value={state.value}
+          onChange={handleChange}
+          placeholder={"Write something awesome..."}
+          // modules={{
+          //   toolbar: {
+          //     container: "#toolbar", // Selector for toolbar container
+          //     handlers: {
+          //       image: () => consoleText(),
+          //     },
+          //   },
+          // }}
+          modules={modules}
+          formats={formats}
+        />
+      </div>
     </>
   );
 };
