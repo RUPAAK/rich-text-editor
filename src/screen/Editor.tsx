@@ -4,6 +4,8 @@ import EditorToolbar, { modules, formats } from "./EditorToolbar";
 import "react-quill/dist/quill.snow.css"; // ES6
 import "../styles.css";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
+import { api } from "../http/api";
 
 var quillObj: any;
 
@@ -26,19 +28,22 @@ const Editor = () => {
 
     input.onchange = async () => {
       var file: any = input.files![0];
+
       var formData = new FormData();
-
       formData.append("image", file);
-
       var fileName = file.name;
 
-      quillObj
-        .getEditor()
-        .insertEmbed(
-          range.index,
-          "image",
-          "https://imgs.search.brave.com/_RFZjrfLjK-fhA1f6qM_wOz_SHGTv1yOiW381ie2fVg/rs:fit:759:225:1/g:ce/aHR0cHM6Ly90c2U0/Lm1tLmJpbmcubmV0/L3RoP2lkPU9JUC5U/VVp4U1JNcTZtMnBx/czlVSWQzNExBSGFF/byZwaWQ9QXBp"
-        );
+      try {
+        // const { data } = await axios.post(
+        //   // "https://flutter-blog-node-backend.herokuapp.com/api/v1/services/imageupload",
+        //   "https://flutter-blog-node-backend.herokuapp.com/api/v1/services/imageupload",
+        //   formData
+        // );
+        const { data } = await api.post("/services/imageupload", formData);
+        quillObj.getEditor().insertEmbed(range.index, "image", data.data);
+      } catch (error) {
+        notify("Failed to upload image");
+      }
     };
   };
   const modules = useMemo(
@@ -56,7 +61,10 @@ const Editor = () => {
   const submitBlog = async () => {
     if (title.length === 0) return notify("Please Give Valid Title");
     if (desc.length === 0) return notify("Please Give Description");
-    console.log(title, desc);
+    const response = await api.post("/admin/blogs", { title, desc });
+    notify("Sucessful blog create");
+    settitle("");
+    settitle("");
   };
   const handleChange = (value: string) => {
     setdesc(value);
