@@ -6,6 +6,7 @@ import "../styles.css";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { api } from "../http/api";
+import { useNavigate } from "react-router-dom";
 
 var quillObj: any;
 
@@ -13,6 +14,7 @@ const titleHeight = 12;
 const notify = (noti: any) => toast(noti);
 
 const Editor = () => {
+  const navigate = useNavigate();
   const [title, settitle] = useState<string>("");
   const [desc, setdesc] = useState<string>("");
 
@@ -61,6 +63,10 @@ const Editor = () => {
     settitle("");
     settitle("");
   };
+  const logout = async () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   const handleChange = (value: string) => {
     setdesc(value);
   };
@@ -79,7 +85,10 @@ const Editor = () => {
         }}
       >
         <p>Draft</p>
+        <button onClick={logout}>Logout</button>
+
         <button onClick={submitBlog}>Publish</button>
+
         <Toaster />
       </div>
       <EditorToolbar />

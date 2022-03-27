@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Editor from "./screen/Editor";
 import Authenticated from "./Global/Authenticated";
 import LoginScreen from "./screen/Login";
+import Home from "./screen/Home";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
           }
         />
         <Route path="/login" element={<LoginScreen />} />
+        <Route path="/" element={<Home />} />
+
       </Routes>
     </Router>
   );
