@@ -34,13 +34,8 @@ const Editor = () => {
       var fileName = file.name;
 
       try {
-        // const { data } = await axios.post(
-        //   // "https://flutter-blog-node-backend.herokuapp.com/api/v1/services/imageupload",
-        //   "https://flutter-blog-node-backend.herokuapp.com/api/v1/services/imageupload",
-        //   formData
-        // );
         const { data } = await api.post("/services/imageupload", formData);
-        quillObj.getEditor().insertEmbed(range.index, "image", data.data);
+        quillObj.getEditor().insertEmbed(range.index, "image", data);
       } catch (error) {
         notify("Failed to upload image");
       }
