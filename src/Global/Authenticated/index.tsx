@@ -12,6 +12,7 @@ const Authenticated: FC<AuthenticatedProps> = (props: { children: any }) => {
   const status = localStorage.getItem("token");
 
   if (!status) {
+    window.location.href = "/login";
     return <LoginScreen />;
   }
 

@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Formik } from "formik";
 
 import { Alert, AlertTitle } from "@material-ui/lab";
@@ -27,10 +27,14 @@ const LoginScreen: FC = (): JSX.Element => {
   let navigate = useNavigate();
   let location = useLocation();
 
-  //   const userProfile = useAppSelector((state) => state.user.profile);
-  //   const dispatch = useAppDispatch();
-
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/");
+
+    return () => {};
+  }, []);
 
   return (
     <Formik
