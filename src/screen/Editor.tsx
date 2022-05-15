@@ -7,6 +7,8 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { api } from "../http/api";
 import { useNavigate } from "react-router-dom";
+import { Button, Chip } from "@material-ui/core";
+import { TextField } from "@mui/material";
 
 var quillObj: any;
 
@@ -17,10 +19,14 @@ const Editor = () => {
   const navigate = useNavigate();
   const [title, settitle] = useState<string>("");
   const [desc, setdesc] = useState<string>("");
+  const [logo, setlogo] = useState<string>("");
+  const [tag, settag] = useState<string>("");
+
+  const [tags, settags] = useState<string[]>([]);
 
   //   const [state, setState] = React.useState({ value: null });
 
-  const consoleText = () => {
+  const imageHandler = () => {
     const range = quillObj.getEditorSelection();
     const input = document.createElement("input");
 
@@ -48,7 +54,7 @@ const Editor = () => {
       toolbar: {
         container: "#toolbar", // Selector for toolbar container
         handlers: {
-          image: () => consoleText(),
+          image: () => imageHandler(),
         },
       },
     }),
@@ -58,7 +64,12 @@ const Editor = () => {
   const submitBlog = async () => {
     if (title.length === 0) return notify("Please Give Valid Title");
     if (desc.length === 0) return notify("Please Give Description");
-    const response = await api.post("/admin/blogs", { title, desc });
+    const response = await api.post("/admin/blogs", {
+      title,
+      desc,
+      logo,
+      tags,
+    });
     notify("Sucessful blog create");
     settitle("");
     settitle("");
@@ -77,21 +88,69 @@ const Editor = () => {
     <>
       <div
         style={{
-          maxWidth: "100%",
-          padding: "0 2rem 0 2rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          top: 0,
+          position: "sticky",
+          zIndex: 5,
+          background: "grey",
+          color: "#fff",
         }}
       >
-        <p>Draft</p>
-        <button onClick={logout}>Logout</button>
+        <div
+          style={{
+            maxWidth: "100%",
+            padding: "0 2rem 0 2rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <p>Draft</p>
+          <Button onClick={logout} variant="outlined">
+            Logout
+          </Button>
 
-        <button onClick={submitBlog}>Publish</button>
+          <Button onClick={submitBlog} variant="outlined">
+            Publish
+          </Button>
 
-        <Toaster />
+          <Toaster />
+        </div>
+        <TextField
+          size="small"
+          fullWidth
+          placeholder="Give href link for blog"
+          onChange={(e) => setlogo(e.target.value)}
+        />
+        <TextField
+          size="small"
+          fullWidth
+          value={tag}
+          placeholder="Enter Tags"
+          onKeyPress={(e) => {
+            if (e.key == "Enter") {
+              settags((prev) => [...prev, tag]);
+              settag("");
+            }
+          }}
+          onChange={(e) => settag(e.target.value)}
+        />
+        {tags.length > 0 &&
+          tags.map((each, index) => {
+            return (
+              <Chip
+                onDelete={() => {
+                  settags((prev) => {
+                    return prev.filter((item) => item != each);
+                  });
+                }}
+                key={index}
+                label={each}
+              />
+            );
+          })}
+        {logo && <img src={logo} style={{ height: "50px" }} />}
+        <EditorToolbar />
       </div>
-      <EditorToolbar />
       <div>
         <input
           value={title}
